@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="../firebase.js"></script>
+    <title>Cliente</title>
+</head>
+
+<body>
+    <div id="membrete">
+        <h2>FARMACIA LIBERTAD</h2>
+        <div class="conteiner">
+            <p>Dirección: Jujuy 400 esq. Gral Paz</p>
+            <p>Teléfono: 0381-4225059 - WhatsApp: 381-4150688</p>            
+        </div>
+    </div>
+    <header>
+        <nav class="navbar bg-green">
+            <div class="container-fluid">
+                <h3 class="navbar-title">
+                    <span id="customer"></span>
+                </h3>
+                <div>
+                    <button class="btn btn-success buttom-back" type="button">
+                        Volver
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div id="notification" class="notification"></div>
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-lg-5 mt-5">
+                <div id="cliente" class="card text-bg mb-3">
+                    <div class="card-header">
+                        <h2>Compra</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="form-control">
+                            <div class="mb-3">
+                                <label class="form-label"><strong> Fecha de Compra </strong></label>
+                                <input class="form-control" name="fecha" type="date" placeholder="Fecha de Compra">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong> Producto</strong></label>
+                                <input class="form-control" name="producto" type="text" placeholder="Producto">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong> Precio </strong></label>
+                                <input class="form-control" name="precio" type="float" placeholder="Precio">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong> Cantidad </strong></label>
+                                <input class="form-control" name="cantidad" type="number" placeholder="Cantidad">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong> Detalles </strong></label>
+                                <textarea class="form-control" name="detalles" placeholder="Info Extra"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i>
+                                    <span>Registrar</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 mt-5">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" id="tableCliente">
+                        <!-- LOS DATOS SE CARGAN DE FORMA DINAMICA -->
+                    </table>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-success" id="tableTotal"></table>
+                </div>
+                <div id="btn" class="d-grid gap-2 col-4 mx-auto">
+                    <button type="button" id="print" class="btn btn-info btn-lg">Imprimir Cuenta</button>
+                    <button type="button" id="delete" class="btn btn-danger btn-lg">Cancelar Cuenta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Vista de cliente-->
+    <div id="viewConsulta" class="modal fade" tabindex="-1" aria-labelledby="viewCustomerlabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Cliente</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        id="closeViewModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="content">
+                        <p><strong>Fecha:</strong> <span id="fechaCompra"></span></p>
+                        <p><strong>Producto:</strong> <span id="producto"></span></p>
+                        <p><strong>Precio:</strong> $ <span id="precio"></span></p>
+                        <p><strong>Cantidad:</strong> <span id="cantidad"></span></p>
+                        <p><strong>Total:</strong> $ <span id="precioT"></span></p>
+                        <p><strong>Detalles:</strong> <span id="detalles"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Formulario de edición de cliente-->
+    <div id="editConsulta" class="modal fade" tabindex="-1" aria-labelledby="editCustomerlabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h3 class="modal-title">Editar Compra</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        id="closeModal"></button>
+                </header>
+                <div class="modal-body">
+                    <form id="edit-consulta">
+                        <div class="field">
+                            <label for="edit-fechaCompra" class="label"><strong> Fecha de Compra </strong></label>
+                            <div class="control">
+                                <input type="date" class="input" name="fechaCompra">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="edit-producto" class="label"><strong> Producto </strong></label>
+                            <div class="control">
+                                <input type="text" class="input" name="producto">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="edit-precio" class="label"><strong> Precio </strong></label>
+                            <div class="control">
+                                <input type="float" class="input" name="precio">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="edit-cantidad"><strong> Cantidad </strong></label>
+                            <div class="control">
+                                <input class="input" name="cantidad" type="number" placeholder="Cantidad">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="edit-detalle" class="label"><strong> Detalle </strong></label>
+                            <div class="control">
+                                <input type="text" class="input" name="detalles">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="closeEditModal" class="btn btn-warning" data-bs-dismiss="modal"
+                                aria-label="close">Cerrar</button>
+                            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">
+                                <i class="fas fa-save"></i>
+                                <span>Guardar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./query.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap");
+
+:root {
+    --dark: #001233;
+    --white: #ffff;
+    --yelow: #ffb703;
+    --green: rgb(4, 68, 2);
+}
+
+header {
+    background-color: var(--green);
+    padding: 10px 0;
+}
+.navbar-title {
+    color: var(--white);
+    font-weight: bold;
+    font-size: 50px;
+    transition: 3s ease-in-out all;
+    text-align: center;
+}
+
+.navbar {
+    z-index: 100;
+    /* O un valor menor según sea necesario */
+}
+/* Login */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 650px;
+    height: 100px;
+    border: 1px solid var(--dark);
+    font-size: 50px;
+}
+
+.card-header {        
+    color: var(--white);
+    transition: color 3s ease-in-out;
+    height: 8vh;
+    margin-left: 2%;
+    text-align: center;
+}
+
+.card-header h3 {
+    font-weight: bold;
+    font-size: 45px;
+}
+
+#title {
+    color: var(--white);
+}
+
+#ingreso {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--green);
+    color: var(--white);
+}
+
+button{    
+    height: 80px;
+}

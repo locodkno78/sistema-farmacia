@@ -1,0 +1,116 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap");
+
+:root {
+    --dark: #001233;
+    --white: #ffff;
+    --yelow: #ffb703;
+    --green: rgb(4, 68, 2);
+}
+
+#membrete {
+    text-align: center;
+}
+
+/*Header*/
+header {
+    background-color: var(--green);
+    padding: 5px 0;
+}
+
+body {
+    font-family: "Comfortaa", cursive;
+}
+
+.navbar-title {
+    color: var(--white);
+    font-weight: bold;
+    font-size: 30px;
+    transition: 3s ease-in-out all;
+}
+
+
+.navbar {
+    z-index: 100;
+    /* O un valor menor según sea necesario */
+}
+
+.form-control {
+    display: flex;
+    border: 1px solid var(--dark);
+    font-size: 30px;
+}
+
+.modal-body {
+    font-size: 30px;
+}
+
+.card-header {
+    height: 8vh;
+    text-align: center;
+}
+
+.card-header h3 {
+    font-weight: bold;
+    font-size: 45px;
+}
+
+#cliente {
+    background-color: var(--green);
+    color: var(--white);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+#tableTotal {
+    font-size: 30px;
+    text-align: center;
+}
+
+#btn {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+@media print {
+
+    /* Oculta los botones y otras partes no deseadas */
+    .buttom-back,
+    .btn-info,
+    .btn-danger,
+    .card .card-header,
+    .card .card-body,
+    .table .button-view,
+    .table .button-edit,
+    .table .button-delete {
+        display: none;
+    }
+
+    .url-info {
+        display: none;
+    }
+
+    /* También puedes ocultar otras partes que no deseas imprimir */
+    /* Por ejemplo, asumo que hay una fila de totales con la clase 'total-row' */
+    th.hidden,
+    td.hidden {
+        display: none;
+    }
+.row{
+    margin-top: -17%;
+}
+    .navbar-title {
+        font-size: 16pt;
+        color: black;
+    }
+
+    /* Establece el estilo deseado para la impresión */
+    body {
+        font-size: 12pt;
+        color: black;
+        /* Otros estilos de impresión si es necesario */
+    }
+}
