@@ -92,9 +92,7 @@ body {
     .url-info {
         display: none;
     }
-
-    /* También puedes ocultar otras partes que no deseas imprimir */
-    /* Por ejemplo, asumo que hay una fila de totales con la clase 'total-row' */
+    
     th.hidden,
     td.hidden {
         display: none;
