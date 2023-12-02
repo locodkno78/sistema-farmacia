@@ -335,6 +335,17 @@ function resetTable() {
   });
 }
 
+
+const btnPedidos = document.querySelector(".button-order");
+
+btnPedidos.addEventListener("click", async (e) => {
+  e.preventDefault();
+  // Redirigir a orders.html al hacer clic en el botón "Pedidos"
+  window.location.href = "../Orders/orders.html";
+});
+
+
+
 const logout = document.querySelector("#logout");
 
 logout.addEventListener("click", async (e) => {
@@ -346,3 +357,4 @@ logout.addEventListener("click", async (e) => {
     console.log(error)
   }
 });
+

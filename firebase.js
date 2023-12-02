@@ -26,12 +26,22 @@ export const consultaForm = (clienteId, fechaCompra, producto, precio, cantidad,
   )
 }
 
+export const pedidosForm = (producto, cantidad) => {
+  return addDoc(collection(db, 'pedidos'), { producto, cantidad}
+  )
+}
+
 export const getForm = async () => {
   const querySnapshot = await getDocs(collection(db, 'clientes'));
   return querySnapshot;
 };
 export const getConsulta = async (clienteId) => {
   const querySnapshot = await getDocs(collection(db, 'clientes', clienteId, 'consultas'));
+  return querySnapshot;
+};
+
+export const getPedidos = async () => {
+  const querySnapshot = await getDocs(collection(db, 'pedidos'));
   return querySnapshot;
 };
 
@@ -88,6 +98,16 @@ export const updateConsulta = async (clienteId, consultasId, newData) => {
   }
 };
 
+export const updatePedidos = async (pedidoId, newData) => {
+  const pedidoRef = doc(db, "pedidos", pedidoId);
+
+  try {
+    await updateDoc(pedidoRef, newData);
+    console.log("Cliente actualizado con éxito");
+  } catch (error) {
+    console.error("Error al actualizar el cliente:", error);
+  }
+};
 
 export const getCliente = async (clienteId) => {
   const clienteRef = doc(db, "clientes", clienteId);
