@@ -1,4 +1,4 @@
-import { getConsulta, consultaForm, getHistorial, deleteConsulta, updateConsulta } from "../firebase.js";
+import { getConsulta, pedidosForm, consultaForm, getHistorial, deleteConsulta, updateConsulta } from "../firebase.js";
 
 
 // Obtiene y muestra el nombre y apellido
@@ -40,12 +40,10 @@ const botonVolver = document.querySelector(".buttom-back");
 botonVolver.addEventListener("click", function () {
   window.location.href = "../Customers/tableCustomers.html";
 });
-
 document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
   const form = document.getElementById("form-control");
 
-  // Agrega el evento submit al formulario
   form.addEventListener("submit", async (e) => {
     e.preventDefault(); // Evitar el envío automático del formulario
 
@@ -65,8 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const clienteId = urlParams.get("clienteId");
 
     if (clienteId) {
-      // Utiliza la función consultaForm para agregar una compra
+      // Utiliza la función consultaForm para agregar una consulta
       await consultaForm(clienteId, fechaCompra, producto, precio, cantidad, precioT, detalles);
+
+      // Utiliza la función pedidosForm para agregar un pedido
+      await pedidosForm(producto, cantidad);
 
       form.reset();
       window.location.reload();
@@ -74,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("ID del cliente no encontrado");
     }
   });
-
 });
 
 
@@ -100,7 +100,7 @@ function updateTable(consultaDataList) {
   columnNames.forEach((columnName) => {
     const columnClass = columnName === 'Acciones' ? 'hidden' : '';
     html += `<th class="${columnClass}">${columnName}</th>`;
-    
+
   });
   html += "</tr></thead><tbody>";
   consultaDataList.forEach((consultaData) => {
@@ -230,7 +230,7 @@ function updateTable(consultaDataList) {
     newData.precioT = isNaN(precio) || isNaN(cantidad) ? 0 : precio * cantidad;
 
     newData.precio = precio;
-    
+
 
     // Actualizar la consulta
     await updateConsulta(clienteId, consultasId, newData);
