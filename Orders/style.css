@@ -50,9 +50,51 @@ header {
 }
 
 /* Contenedor principal */
-.container {
-    display: flex;
+.conteiner {
+    
     justify-content: center;
     align-items: center;
     height: 100vh;
+    
+}
+
+#table{
+    text-align: center;   
+}
+
+@media print {
+
+    /* Oculta los botones y otras partes no deseadas */
+    .button-back,
+    .btn-info,
+    .btn-danger,
+    .searchButton,
+    .searchInput,
+    .card .card-header,
+    .card .card-body,
+    .table .button-view,
+    .table .button-edit,
+    .table .button-delete,
+    .navbar-title {
+        display: none;
+    }    
+    
+    th.hidden,
+    td.hidden {
+        display: none;
+    }
+.row{
+    margin-top: -17%;
+}
+    .navbar-title {
+        font-size: 16pt;
+        color: black;
+    }
+
+    /* Establece el estilo deseado para la impresión */
+    body {
+        font-size: 12pt;
+        color: black;
+        /* Otros estilos de impresión si es necesario */
+    }
 }

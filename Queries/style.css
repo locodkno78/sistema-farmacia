@@ -89,17 +89,15 @@ body {
         display: none;
     }
 
-    .url-info {
-        display: none;
-    }
-    
     th.hidden,
     td.hidden {
         display: none;
     }
-.row{
-    margin-top: -17%;
-}
+
+    .row {
+        margin-top: -17%;
+    }
+
     .navbar-title {
         font-size: 16pt;
         color: black;

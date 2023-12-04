@@ -75,48 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("ID del cliente no encontrado");
     }
   });
-
-
-
-
-
-
-    
-  
-
-  // Agrega el evento submit al formulario para pedidos
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // Evitar el envío automático del formulario
-
-
-    const producto = form.querySelector('input[name="producto"]').value;
-    const cantidad = form.querySelector('input[name="cantidad"]').value;
-
-    if (!producto || !cantidad) {
-      // Muestra un mensaje de error o realiza alguna acción adecuada si falta información
-      console.error("Todos los campos son obligatorios");
-      return;
-    }
-
-    const clienteId = urlParams.get("clienteId");
-
-    if (clienteId) {
-      try {
-        await pedidosForm(clienteId, producto, cantidad);
-        form.reset();
-        // Realiza otras acciones después de agregar el pedido
-      } catch (error) {
-        console.error("Error al agregar el pedido:", error);
-      }
-
-
-      form.reset();
-      window.location.reload();
-    } else {
-      console.error("ID del cliente no encontrado");
-    }
-  });
-
 });
 
 

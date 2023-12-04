@@ -65,6 +65,15 @@ export const deleteConsulta = async (clienteId, consultasId) => {
     console.error("Error al eliminar la consulta:", error);
   }
 };
+export const deletePedido = async (pedidoId) => {
+  try {
+    const pedidoRef = doc(db, "pedidos",pedidoId);
+    await deleteDoc(pedidoRef);
+    console.log("Producto eliminado correctamente");
+  } catch (error) {
+    console.error("Error al eliminar el producto:", error);
+  }
+};
 
 
 export const updateCliente = async (clienteId, newData) => {
@@ -103,7 +112,7 @@ export const updatePedidos = async (pedidoId, newData) => {
 
   try {
     await updateDoc(pedidoRef, newData);
-    console.log("Cliente actualizado con éxito");
+    console.log("Producto actualizado con éxito");
   } catch (error) {
     console.error("Error al actualizar el cliente:", error);
   }
@@ -135,6 +144,18 @@ export const getHistorial = async (clienteId, consultasId) => {
   } else {
     console.error("Valores de clienteId o consultasId indefinidos");
     return null; // Retorna null en caso de valores indefinidos
+  }
+};
+
+export const getProducto = async (productoId) => {
+  const productoRef = doc(db, "pedidos", productoId);
+  const productoSnapshot = await getDoc(productoRef);
+
+  if (productoSnapshot.exists()) {
+    return productoSnapshot.data();
+  } else {
+    console.error("Producto no encontrado");
+    return null;
   }
 };
 
