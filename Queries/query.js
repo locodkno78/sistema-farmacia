@@ -65,14 +65,29 @@ document.addEventListener("DOMContentLoaded", function () {
     if (clienteId) {
       // Utiliza la función consultaForm para agregar una consulta
       await consultaForm(clienteId, fechaCompra, producto, precio, cantidad, precioT, detalles);
-
+      
       // Utiliza la función pedidosForm para agregar un pedido
       await pedidosForm(producto, cantidad);
-
+      
+      showNotification("Compra agregada correctamente");
       form.reset();
       window.location.reload();
     } else {
       console.error("ID del cliente no encontrado");
+    }
+    function showNotification(message) {
+      const notificationElement = document.getElementById("notification");
+      notificationElement.textContent = message;
+  
+      // Agrega estilos de diseño o clases 
+      notificationElement.style.backgroundColor = "#08C706"; // Fondo verde
+      notificationElement.style.color = "white"; // Texto blanco
+      notificationElement.style.fontSize = "30px";
+  
+      // Muestra la notificación por 3 segundos
+      setTimeout(() => {
+        notificationElement.textContent = "";
+      }, 3000);
     }
   });
 });
@@ -194,10 +209,7 @@ function updateTable(consultaDataList) {
         // También puedes añadir el clienteId al formulario si lo necesitas después
         editForm.setAttribute("data-cliente-id", clienteId);
         editForm.setAttribute("data-consultas-id", consultasId);
-
-
-        // Asegúrate de quitar el listener antes de agregarlo nuevamente
-        // para evitar múltiples listeners en form.submit
+        
         editForm.removeEventListener("submit", handleEditSubmit);
 
         // Agregar el evento submit al formulario
@@ -230,7 +242,6 @@ function updateTable(consultaDataList) {
     newData.precioT = isNaN(precio) || isNaN(cantidad) ? 0 : precio * cantidad;
 
     newData.precio = precio;
-
 
     // Actualizar la consulta
     await updateConsulta(clienteId, consultasId, newData);
