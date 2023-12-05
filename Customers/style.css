@@ -34,6 +34,10 @@ header {
     font-size: 30px;
 }
 
+.modal-header {
+    background-color: var(--green);
+    color: var(--white);
+}
 /* Estilos para dispositivos pequeños */
 @media (max-width: 768px) {
     .navbar-title {
@@ -99,9 +103,7 @@ header {
 .modal-body .content p {
     text-align: center;
 }
-.modal-title{
-    color: var(--white);
-}
+
 /* Estilos adicionales */
 h1 {
     font-weight: bold;

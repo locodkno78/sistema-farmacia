@@ -94,6 +94,7 @@ function updateTable(querySnapshot) {
       await deletePedido(pedidosId);
       const newQuerySnapshot = await getPedidos();
       updateTable(newQuerySnapshot);
+      showNotification("Producto Eliminado");
     });
   });
 
@@ -152,7 +153,7 @@ function updateTable(querySnapshot) {
     // Actualizar la tabla después de la edición 
     const updatedQuerySnapshot = await getPedidos();
     updateTable(updatedQuerySnapshot);
-    /*showNotification("Edición Correcta");*/
+    showNotification("Edición Correcta");
   };
 
   const deleteAll = document.getElementById("delete");
@@ -180,12 +181,28 @@ function updateTable(querySnapshot) {
 
 
         updateTable(pedidoDataList);
-        /*showNotification("La cuenta se eliminó correctamente");*/
+        showNotification("El pedido se eliminó correctamente");
       } catch (error) {
-        console.error("Error el pedido:", error);
+        console.error("Error al eliminar el pedido:", error);
       }
     }
   });
+
+  // Función para mostrar la notificación
+  function showNotification(message) {
+    const notificationElement = document.getElementById("notification");
+    notificationElement.textContent = message;
+
+    // Agrega estilos de diseño o clases 
+    notificationElement.style.backgroundColor = "#08C706"; // Fondo verde
+    notificationElement.style.color = "white"; // Texto blanco
+    notificationElement.style.fontSize = "30px";
+
+    // Muestra la notificación por 3 segundos
+    setTimeout(() => {
+      notificationElement.textContent = "";
+    }, 3000);
+  }
 
 }
 

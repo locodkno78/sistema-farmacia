@@ -44,6 +44,11 @@ body {
     font-size: 30px;
 }
 
+.modal-header {
+    background-color: var(--green);
+    color: var(--white);
+}
+
 .card-header {
     height: 8vh;
     text-align: center;
