@@ -252,7 +252,7 @@ function updateTable(consultaDataList) {
 
     // Actualizar la tabla después de la edición 
     const updatedQuerySnapshot = await getConsulta(clienteId, consultasId);
-    showNotification("Consulta Actualizada correctamente");
+    showNotification("Coompra actualizada correctamente");
     const consultaDataList = updatedQuerySnapshot.docs.map((doc) => {
       const consultaData = doc.data();
       return { ...consultaData, id: doc.id };
