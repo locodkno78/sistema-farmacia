@@ -139,7 +139,7 @@ function updateTable(querySnapshot) {
 
     // Obtener los nuevos datos del formulario
     const newData = {
-      name: editForm.elements["name"].value,
+      producto: editForm.elements["name"].value,
       cantidad: editForm.elements["cantidad"].value
     };
 
