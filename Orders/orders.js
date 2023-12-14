@@ -74,7 +74,7 @@ function updateTable(querySnapshot) {
     const nameElement = document.getElementById("name");
     const cantidadElement = document.getElementById("cantidad");
 
-    nameElement.textContent = productoData.name;
+    nameElement.textContent = productoData.producto;
     cantidadElement.textContent = productoData.cantidad;
 
 
