@@ -1,13 +1,11 @@
-import {
-  saveForm,
-  getForm,
+import { 
   deletePedido,
   updatePedidos,
   getProducto,
   auth,
   getPedidos
 } from "../firebase.js";
-import { showMessage } from "../Logueo/showMessage.js";
+
 
 const clientesTable = document.getElementById("table");
 
