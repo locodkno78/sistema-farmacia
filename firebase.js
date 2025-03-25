@@ -21,6 +21,11 @@ export const saveForm = (dni, name, surname, date, address, phone, email, obraSo
   )
 }
 
+export const saveFormProd = (name, quantity, price, stock, drug) => {
+  return addDoc(collection(db, 'productos'), { name, quantity, price, stock, drug }
+  )
+}
+
 export const consultaForm = (clienteId, fechaCompra, producto, precio, cantidad, precioT, detalles) => {
   return addDoc(collection(db, 'clientes', clienteId, 'consultas'), { fechaCompra, producto, precio, cantidad, precioT, detalles }
   )
@@ -35,6 +40,12 @@ export const getForm = async () => {
   const querySnapshot = await getDocs(collection(db, 'clientes'));
   return querySnapshot;
 };
+
+export const getFormProd = async () => {
+  const querySnapshot = await getDocs(collection(db, 'productos'));
+  return querySnapshot;
+};
+
 export const getConsulta = async (clienteId) => {
   const querySnapshot = await getDocs(collection(db, 'clientes', clienteId, 'consultas'));
   return querySnapshot;
@@ -53,6 +64,16 @@ export const deleteCliente = async (clienteId) => {
     console.log("Cliente eliminado correctamente");
   } catch (error) {
     console.error("Error al eliminar el cliente:", error);
+  }
+};
+
+export const deleteProduct = async (productId) => {
+  try {
+    const productRef = doc(db, "productos", productId);
+    await deleteDoc(productRef);
+    console.log("Producto eliminado correctamente");
+  } catch (error) {
+    console.error("Error al eliminar el producto:", error);
   }
 };
 
@@ -118,6 +139,17 @@ export const updatePedidos = async (pedidoId, newData) => {
   }
 };
 
+export const updateProduct = async (productoId, newData) => {
+  const productoRef = doc(db, "productos", productoId);
+
+  try {
+    await updateDoc(productoRef, newData);
+    console.log("Producto actualizado con éxito");
+  } catch (error) {
+    console.error("Error al actualizar el producto:", error);
+  }
+};
+
 export const getCliente = async (clienteId) => {
   const clienteRef = doc(db, "clientes", clienteId);
   const clienteSnapshot = await getDoc(clienteRef);
@@ -126,6 +158,18 @@ export const getCliente = async (clienteId) => {
     return clienteSnapshot.data();
   } else {
     console.error("Cliente no encontrado");
+    return null;
+  }
+};
+
+export const getProduct = async (productId) => {
+  const productRef = doc(db, "productos", productId);
+  const productSnapshot = await getDoc(productRef);
+
+  if (productSnapshot.exists()) {
+    return productSnapshot.data();
+  } else {
+    console.error("Producto no encontrado");
     return null;
   }
 };

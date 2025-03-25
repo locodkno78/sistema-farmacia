@@ -345,6 +345,13 @@ btnPedidos.addEventListener("click", async (e) => {
 });
 
 
+const btnProductos = document.querySelector(".button-products");
+
+btnProductos.addEventListener("click", async (e) => {
+  e.preventDefault();
+  // Redirigir a products.html al hacer clic en el botón "Pedidos"
+  window.location.href = "../Products/products.html";
+});
 
 const logout = document.querySelector("#logout");
 

@@ -25,7 +25,7 @@ signInForm.addEventListener("submit", async (e) => {
     // Verificar si el nombre de usuario coincide
     if (userCredentials.user.displayName === username) {
       console.log("Inicio de sesión exitoso");
-      window.location.href = "../../Customers/tableCustomers.html";
+      window.location.href = "../Customers/tableCustomers.html";
     } else {
       showMessage("El nombre de usuario es incorrecto", "error");
     }
