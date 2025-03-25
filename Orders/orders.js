@@ -1,13 +1,11 @@
-import {
-  saveForm,
-  getForm,
+import { 
   deletePedido,
   updatePedidos,
   getProducto,
   auth,
   getPedidos
 } from "../firebase.js";
-import { showMessage } from "../Logueo/showMessage.js";
+
 
 const clientesTable = document.getElementById("table");
 
@@ -139,7 +137,7 @@ function updateTable(querySnapshot) {
 
     // Obtener los nuevos datos del formulario
     const newData = {
-      name: editForm.elements["name"].value,
+      producto: editForm.elements["name"].value,
       cantidad: editForm.elements["cantidad"].value
     };
 
