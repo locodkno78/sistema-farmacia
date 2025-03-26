@@ -1,4 +1,4 @@
-import { 
+import {
   deletePedido,
   updatePedidos,
   getProducto,
@@ -6,15 +6,7 @@ import {
   getPedidos
 } from "../firebase.js";
 
-
 const clientesTable = document.getElementById("table");
-
-// Botón volver
-const botonVolver = document.querySelector(".button-back");
-botonVolver.addEventListener("click", async (e) => {
-  e.preventDefault();
-  window.location.href = "../Customers/tableCustomers.html";
-});
 
 function updateTable(querySnapshot) {
   let html = "<thead><tr>";
@@ -163,7 +155,7 @@ function updateTable(querySnapshot) {
       try {
         // Obtén todas las consultas del cliente
         const querySnapshot = await getPedidos();
-       
+
 
         // Elimina cada consulta
         await Promise.all(querySnapshot.docs.map(async (doc) => {

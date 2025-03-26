@@ -3,10 +3,9 @@ import {
   getForm,
   deleteCliente,
   updateCliente,
-  getCliente,
-  auth
+  getCliente,  
 } from "../firebase.js";
-import { signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
 
 const clientesTable = document.getElementById("table");
 const openModal = document.getElementById("openRegisterModal");
@@ -216,12 +215,7 @@ function updateTable(querySnapshot) {
 window.addEventListener("DOMContentLoaded", async (e) => {
   const querySnapshot = await getForm();
   updateTable(querySnapshot);
-  const user = auth.currentUser;
-  if (user) {
-    const userName = user.displayName;
-    const nameElement = document.getElementById("user-name");
-    nameElement.textContent = userName;
-  }
+  
 });
 
 const showRegisterModal = () => {
@@ -336,32 +330,4 @@ function resetTable() {
 }
 
 
-const btnPedidos = document.querySelector(".button-order");
-
-btnPedidos.addEventListener("click", async (e) => {
-  e.preventDefault();
-  // Redirigir a orders.html al hacer clic en el botón "Pedidos"
-  window.location.href = "../Orders/orders.html";
-});
-
-
-const btnProductos = document.querySelector(".button-products");
-
-btnProductos.addEventListener("click", async (e) => {
-  e.preventDefault();
-  // Redirigir a products.html al hacer clic en el botón "Pedidos"
-  window.location.href = "../Products/products.html";
-});
-
-const logout = document.querySelector("#logout");
-
-logout.addEventListener("click", async (e) => {
-  e.preventDefault();
-  try {
-    await signOut(auth)
-    window.location.href = "../Logueo/login.html";
-  } catch (error) {
-    console.log(error)
-  }
-});
 
