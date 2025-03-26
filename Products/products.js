@@ -13,12 +13,6 @@ const openModal = document.getElementById("openRegisterModal");
 const modal = document.getElementById("newCustomer");
 const closeModal = document.getElementById("closeRegisterModal");
 const registerForm = document.getElementById("register-form");
-// Botón volver
-const botonVolver = document.querySelector(".button-back");
-botonVolver.addEventListener("click", async (e) => {
-    e.preventDefault();
-    window.location.href = "../Customers/tableCustomers.html";
-});
 
 // Carga la tabla con datos
 function updateTable(querySnapshot) {
@@ -247,7 +241,7 @@ clientesTable.addEventListener("click", async (e) => {
         editForm.elements["quantity"].value = productData.quantity;
         editForm.elements["price"].value = productData.price;
         editForm.elements["stock"].value = productData.stock;
-        editForm.elements["drug"].value = productData.drug;        
+        editForm.elements["drug"].value = productData.drug;
 
         const editModal = document.getElementById("edit-form");
         editModal.classList.add("is-active");

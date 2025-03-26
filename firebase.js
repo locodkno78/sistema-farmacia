@@ -1,15 +1,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, updateDoc, getDoc, setDoc, query,
+  where} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDXtCFAY0NaZxQLuBlwI2Ob1wDU9ajpFYY",
-    authDomain: "farmacia-bb1a5.firebaseapp.com",
-    projectId: "farmacia-bb1a5",
-    storageBucket: "farmacia-bb1a5.appspot.com",
-    messagingSenderId: "617354015651",
-    appId: "1:617354015651:web:7e39b7ad5cfcf2c6e7a016"
-  };
+  apiKey: "AIzaSyDXtCFAY0NaZxQLuBlwI2Ob1wDU9ajpFYY",
+  authDomain: "farmacia-bb1a5.firebaseapp.com",
+  projectId: "farmacia-bb1a5",
+  storageBucket: "farmacia-bb1a5.appspot.com",
+  messagingSenderId: "617354015651",
+  appId: "1:617354015651:web:7e39b7ad5cfcf2c6e7a016"
+};
 
 const app = initializeApp(firebaseConfig);
 // Inicializar Firebase Firestore
@@ -32,7 +33,7 @@ export const consultaForm = (clienteId, fechaCompra, producto, precio, cantidad,
 }
 
 export const pedidosForm = (producto, cantidad) => {
-  return addDoc(collection(db, 'pedidos'), { producto, cantidad}
+  return addDoc(collection(db, 'pedidos'), { producto, cantidad }
   )
 }
 
@@ -88,7 +89,7 @@ export const deleteConsulta = async (clienteId, consultasId) => {
 };
 export const deletePedido = async (pedidoId) => {
   try {
-    const pedidoRef = doc(db, "pedidos",pedidoId);
+    const pedidoRef = doc(db, "pedidos", pedidoId);
     await deleteDoc(pedidoRef);
     console.log("Producto eliminado correctamente");
   } catch (error) {
@@ -203,9 +204,19 @@ export const getProducto = async (productoId) => {
   }
 };
 
+// Función específica para obtener productos
+export const getProducts = async () => {
+  const querySnapshot = await getDocs(collection(db, 'productos'));
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
 
 
-
-
-
-export { app, db, doc, auth, setDoc }
+export {
+  app, db, doc, auth, setDoc, collection, getDocs,
+  addDoc,
+  query,
+  where,
+  updateDoc,
+  getDoc,
+  deleteDoc
+}

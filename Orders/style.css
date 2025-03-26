@@ -14,7 +14,10 @@ body {
 /* Header */
 header {
     background-color: var(--green);
-    padding: 10px 0;
+}
+
+.container {
+    margin-top: 5%;
 }
 
 .container-fluid {
@@ -33,6 +36,7 @@ header {
 .modal-body {
     font-size: 30px;
 }
+
 .modal-header {
     background-color: var(--green);
     color: var(--white);
@@ -55,15 +59,15 @@ header {
 
 /* Contenedor principal */
 .conteiner {
-    
+
     justify-content: center;
     align-items: center;
     height: 100vh;
-    
+
 }
 
-#table{
-    text-align: center;   
+#table {
+    text-align: center;
 }
 
 @media print {
@@ -81,15 +85,17 @@ header {
     .table .button-delete,
     .navbar-title {
         display: none;
-    }    
-    
+    }
+
     th.hidden,
     td.hidden {
         display: none;
     }
-.row{
-    margin-top: -17%;
-}
+
+    .row {
+        margin-top: -17%;
+    }
+
     .navbar-title {
         font-size: 16pt;
         color: black;

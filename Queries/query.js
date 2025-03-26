@@ -6,11 +6,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const apellidoCliente = urlParams.get("apellido");
 const nombreCliente = urlParams.get("nombre");
 const dniCliente = urlParams.get("dni");
-//const dateCliente = urlParams.get("date");
+const dateCliente = urlParams.get("date");
 const osCliente = urlParams.get("obraSocial");
 
 
-/*function calcularEdad(fechaNacimiento) {
+function calcularEdad(fechaNacimiento) {
   const fechaNac = new Date(fechaNacimiento);
   const fechaActual = new Date();
 
@@ -29,11 +29,11 @@ const osCliente = urlParams.get("obraSocial");
 const fechaNacimientoCliente = dateCliente; // Reemplaza esto con la fecha de nacimiento real
 
 // Calcular la edad
-const edadCliente = calcularEdad(fechaNacimientoCliente);*/
+const edadCliente = calcularEdad(fechaNacimientoCliente);
 
 // Encuentra el elemento donde deseas mostrar el nombre y establece su contenido
 const customerElement = document.getElementById("customer");
-customerElement.textContent = `${apellidoCliente} ${nombreCliente} - DNI: ${dniCliente} - ${osCliente}`;
+customerElement.textContent = `${apellidoCliente} ${nombreCliente} - DNI: ${dniCliente} - ${osCliente} - ${edadCliente} años`;
 
 // Botón volver
 const botonVolver = document.querySelector(".buttom-back");

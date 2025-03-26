@@ -18,23 +18,11 @@
 
 <body>
     <header>
-        <nav class="navbar">
-            <div class="d-flex container-fluid">
-                <h3 class="navbar-title">
-                    <span id="user-name"></span>
-                </h3>
-                <div>
-                    <button class="btn button-back btn-warning" type="button" id="button-back"> Volver </button>                
-                    <button class="btn btn-danger" type="button" id="logout">
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-        </nav>
+        <div id="navbar-placeholder"></div>
     </header>
-    <div id="notification" class="notification"></div>
-    <main>
-        <div class="conteiner">
+    <div class="container">
+        <div id="notification" class="notification"></div>
+        <main>
             <div class="header d-flex container-fluid">
                 <h1>Productos</h1>
                 <div class="control">
@@ -44,16 +32,16 @@
                         <button type="button" class="btn btn-success searchButton" id="searchButton">Buscar</button>
                     </form>
                 </div>
-                        <button type="button" class="btn btn-success" id="openRegisterModal" data-bs-toggle="modal"
-                            data-bs-target="#newCustomer">
-                            <i class="fas fa-plus"></i><span> Nuevo Producto</span></button>
+                <button type="button" class="btn btn-success" id="openRegisterModal" data-bs-toggle="modal"
+                    data-bs-target="#newCustomer">
+                    <i class="fas fa-plus"></i><span> Nuevo Producto</span></button>
             </div>
             <div class="table-responsive" id="tableButtons">
                 <table class="table table-hover table-bordered" id="table">
                     <!--LOS DATOS SE CARGARÁN DE FORMA DINAMICA-->
                 </table>
             </div>
-        </div>
+    </div>
     </main>
     <!--Registro de nuevo producto-->
     <div class="modal fade" id="newCustomer" tabindex="-1" aria-labelledby="newCustomerlabel" aria-hidden="true">
@@ -186,6 +174,7 @@
             </div>
         </div>
     </div>
+    <script type="module" src="../navbar.js"></script>
 </body>
 
 </html>
