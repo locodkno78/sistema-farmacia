@@ -1,5 +1,69 @@
-import { getConsulta, pedidosForm, consultaForm, getHistorial, deleteConsulta, updateConsulta } from "../firebase.js";
+import { db, collection, addDoc, getDocs, getConsulta, pedidosForm, consultaForm, getHistorial, deleteConsulta, updateConsulta } from "../firebase.js";
 
+// Función de búsqueda de productos
+document.getElementById("searchButton").addEventListener("click", async () => {
+  const searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
+  if (searchInput === "") {
+      alert("Ingrese un nombre de producto para buscar.");
+      return;
+  }
+
+  try {
+      const productosRef = collection(db, "productos");
+      const querySnapshot = await getDocs(productosRef);
+
+      let productosEncontrados = [];
+
+      querySnapshot.forEach(doc => {
+          let producto = doc.data();
+          if (producto.name.toLowerCase().includes(searchInput)) {
+              productosEncontrados.push({ id: doc.id, ...producto });
+          }
+      });
+
+      if (productosEncontrados.length > 0) {
+          mostrarProductosEnModal(productosEncontrados);
+      } else {
+          alert("No se encontraron productos.");
+      }
+  } catch (error) {
+      console.error("Error al buscar productos:", error);
+  }
+});
+
+function mostrarProductosEnModal(productos) {
+  let modalBody = document.getElementById("modalBody");
+  modalBody.innerHTML = "";
+
+  productos.forEach(producto => {
+      let div = document.createElement("div");
+      div.classList.add("producto-item", "p-2", "border", "mb-2", "d-flex", "justify-content-between");
+      div.innerHTML = `
+          <span>${producto.name} - $${producto.price}</span>
+          <button class="btn btn-primary btn-sm seleccionar-producto" data-nombre="${producto.name}" data-precio="${producto.price}">Seleccionar</button>
+      `;
+      modalBody.appendChild(div);
+  });
+
+  let modal = new bootstrap.Modal(document.getElementById("productModal"));
+  modal.show();
+
+  document.querySelectorAll(".seleccionar-producto").forEach(button => {
+      button.addEventListener("click", function() {
+          let nombre = this.getAttribute("data-nombre");
+          let precio = this.getAttribute("data-precio");
+
+          // Asignar valores a los campos del formulario
+          document.querySelector("input[name='producto']").value = nombre;
+          document.querySelector("input[name='precio']").value = precio;
+
+          modal.hide();
+      });
+  });
+}
+
+// Array para almacenar los productos agregados a la tabla
+let productosEnTabla = [];
 
 // Obtiene y muestra el nombre y apellido
 const urlParams = new URLSearchParams(window.location.search);
