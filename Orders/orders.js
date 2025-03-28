@@ -26,11 +26,24 @@ function updateTable(querySnapshot) {
   querySnapshot.forEach((doc) => {
     const pedidoData = doc.data();
 
+    let producto = "Desconocido"; // Valor por defecto
+    let cantidad = "0"; // Valor por defecto
+
+    // Verificar si existe el array de productos y si tiene elementos
+    if (pedidoData.productos && Array.isArray(pedidoData.productos) && pedidoData.productos.length > 0) {
+      // Caso con array de productos
+      producto = pedidoData.productos.map(p => p.producto).join(", "); // Concatenar todos los productos
+      cantidad = pedidoData.productos.map(p => p.cantidad).join(", "); // Concatenar todas las cantidades
+    } else if (pedidoData.producto && pedidoData.cantidad) {
+      // Caso con campos directos
+      producto = pedidoData.producto;
+      cantidad = pedidoData.cantidad;
+    }
 
     html += `
       <tr>
-        <td>${pedidoData.producto}</td>
-        <td>${pedidoData.cantidad}</td>                
+        <td>${producto}</td>
+        <td>${cantidad}</td>                
         <td>
           <button type="button" class="btn btn-success button-view" data-bs-toggle="modal" data-bs-target="#viewProducto" data-id="${doc.id}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">
             <i class="fas fa-sharp fa-solid fa-eye"></i>
@@ -45,32 +58,42 @@ function updateTable(querySnapshot) {
       </tr>`;
   });
 
+
   html += '</tbody>';
   clientesTable.innerHTML = html;
 
+  // Listeners para los botones de ver y editar
   const buttonView = clientesTable.querySelectorAll(".button-view");
   buttonView.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
-      const productoId = e.currentTarget.getAttribute("data-id");
-      const productoData = await getProducto(productoId);
-      if (productoData !== null) {
-        showProductoModal(productoData);
+      const pedidoId = e.currentTarget.getAttribute("data-id");
+      const pedidoData = await getProducto(pedidoId);
+      if (pedidoData !== null) {
+        showProductoModal(pedidoData);
       } else {
         console.log("Producto no encontrado");
       }
     });
   });
-  function showProductoModal(productoData) {
+
+  function showProductoModal(pedidoData) {
     const nameElement = document.getElementById("name");
     const cantidadElement = document.getElementById("cantidad");
 
-    nameElement.textContent = productoData.producto;
-    cantidadElement.textContent = productoData.cantidad;
-
+    if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
+      // Si el pedido tiene múltiples productos
+      nameElement.textContent = pedidoData.productos.map(p => p.producto).join(", ");
+      cantidadElement.textContent = pedidoData.productos.map(p => p.cantidad).join(", ");
+    } else {
+      // Si es un solo producto
+      nameElement.textContent = pedidoData.producto || "Desconocido";
+      cantidadElement.textContent = pedidoData.cantidad || "0";
+    }
 
     const productoModal = document.getElementById("viewProducto");
     productoModal.classList.add("is-active");
   }
+
 
   const closeProductoModalButton = document.getElementById("closeViewModal");
   closeProductoModalButton.addEventListener("click", () => {
@@ -88,53 +111,55 @@ function updateTable(querySnapshot) {
     });
   });
 
-  const buttonUpDate = clientesTable.querySelectorAll(".button-edit");
-  const editForm = document.getElementById("edit-form");
+  let currentPedidoId = null; // Variable global para almacenar el ID del pedido en edición
 
-  buttonUpDate.forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
-      const pedidoId = e.currentTarget.getAttribute("data-id");
-      const pedidoData = await getProducto(pedidoId);
+const buttonUpDate = clientesTable.querySelectorAll(".button-edit");
+const editForm = document.getElementById("edit-form");
 
-      if (pedidoData !== null) {
-        // Llenar el formulario con los datos existentes
-        const editForm = document.getElementById("edit-form");
-        editForm.elements["name"].value = pedidoData.producto;
-        editForm.elements["cantidad"].value = pedidoData.cantidad;
+buttonUpDate.forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    currentPedidoId = e.currentTarget.getAttribute("data-id"); // Guardar el ID del pedido actual
+    const pedidoData = await getProducto(currentPedidoId);
 
-        // Mostrar el formulario de edición
-        const editModal = document.getElementById("editProducto");
-        editModal.classList.add("is-active");
-
-        // También puedes añadir el clienteId al formulario si lo necesitas después
-        editForm.setAttribute("data-id", pedidoId);
-
-        // Asegúrate de quitar el listener antes de agregarlo nuevamente
-        // para evitar múltiples listeners en form.submit
-        editForm.removeEventListener("submit", handleEditSubmit);
-
-        // Agregar el evento submit al formulario
-        editForm.addEventListener("submit", handleEditSubmit);
-      } else {
-        console.log("Producto no encontrado");
-      }
-    });
+    if (pedidoData.productos && Array.isArray(pedidoData.productos) && pedidoData.productos.length > 0) {
+      // Si hay múltiples productos, usa el primero como referencia
+      editForm.elements["name"].value = pedidoData.productos[0].producto || "";
+      editForm.elements["cantidad"].value = pedidoData.productos[0].cantidad || "0";
+    } else {
+      editForm.elements["name"].value = pedidoData.producto || "";
+      editForm.elements["cantidad"].value = pedidoData.cantidad || "0";
+    }
   });
-  // Función que maneja el envío del formulario
-  const handleEditSubmit = async (event) => {
-    event.preventDefault();
+});
 
-    // Obtener el clienteId del formulario
-    const pedidoId = event.currentTarget.getAttribute("data-id");
+// Función para manejar el envío del formulario de edición
+const handleEditSubmit = async (event) => {
+  event.preventDefault(); // Evita la recarga de la página
 
-    // Obtener los nuevos datos del formulario
-    const newData = {
-      producto: editForm.elements["name"].value,
-      cantidad: editForm.elements["cantidad"].value
-    };
+  if (!currentPedidoId) {
+    alert("Error: No se ha seleccionado ningún pedido para editar.");
+    return;
+  }
 
-    // Actualizar el cliente
-    await updatePedidos(pedidoId, newData);
+  // Obtener los nuevos datos del formulario
+  const newProducto = {
+    producto: editForm.elements["name"].value,
+    cantidad: parseInt(editForm.elements["cantidad"].value, 10),
+  };
+
+  try {
+    const pedidoData = await getProducto(currentPedidoId); // Obtener datos actuales del pedido
+
+    // Si el pedido tiene productos (array de productos), actualizamos el primero
+    if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
+      pedidoData.productos[0] = newProducto; // Actualizamos el primer producto en el array
+    } else {
+      pedidoData.producto = newProducto.producto;
+      pedidoData.cantidad = newProducto.cantidad;
+    }
+
+    // Actualizar el pedido con los nuevos datos
+    await updatePedidos(currentPedidoId, pedidoData);
 
     // Cerrar el modal después de la edición 
     const editModal = document.getElementById("editProducto");
@@ -144,7 +169,15 @@ function updateTable(querySnapshot) {
     const updatedQuerySnapshot = await getPedidos();
     updateTable(updatedQuerySnapshot);
     showNotification("Edición Correcta");
-  };
+  } catch (error) {
+    console.error("Error al actualizar el pedido:", error);
+    alert("Error al actualizar el pedido");
+  }
+};
+
+// Agregar el evento submit al formulario de edición
+editForm.addEventListener("submit", handleEditSubmit);
+
 
   const deleteAll = document.getElementById("delete");
 

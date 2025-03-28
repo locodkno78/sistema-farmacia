@@ -175,6 +175,8 @@ export const getProduct = async (productId) => {
   }
 };
 
+
+
 export const getHistorial = async (clienteId, consultasId) => {
   if (clienteId && consultasId) { // Comprueba que ambos valores no sean undefined
     const consultaRef = doc(db, 'clientes', clienteId, 'consultas', consultasId);
