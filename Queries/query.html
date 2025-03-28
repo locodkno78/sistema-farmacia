@@ -32,6 +32,30 @@
         </nav>
     </header>
     <div id="notification" class="notification"></div>
+    <div class="header d-flex container-fluid">
+        <h1>Ventas</h1>
+        <div class="control">
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" id="searchInput" type="search" placeholder="Producto"
+                    aria-label="Search">
+                <button type="button" class="btn btn-success" id="searchButton">Buscar</button>
+            </form>
+        </div>
+        <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productModalLabel">Seleccionar Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalBody">
+                        <!-- Aquí se cargarán los productos dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
     <div class="container mt-3">
         <div class="row">
             <div class="col-lg-5 mt-5">
