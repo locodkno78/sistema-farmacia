@@ -102,6 +102,23 @@ window.agregarATabla = function(nombre, precio) {
     totalCell.textContent = `$${precio.toFixed(2)}`;
     totalCell.classList.add("total");
 
+    // Celda para boton de acción Eliminar
+    let actionCell = row.insertCell(5);
+    actionCell.classList.add("text-center");    
+
+    // Botón Eliminar
+    let deleteButton = document.createElement("button");
+    deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteButton.addEventListener("click", function() {
+        row.remove();
+        productosEnTabla = productosEnTabla.filter(p => p.row !== row);
+        actualizarTotalGeneral();
+    });
+
+    // Agregar boton a la celda    
+    actionCell.appendChild(deleteButton);
+
     // Guardar el producto y cantidad para luego enviarlo al pedido
     productosEnTabla.push({ nombre, cantidad: 1, row });
 
