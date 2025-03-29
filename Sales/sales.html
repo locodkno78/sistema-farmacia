@@ -18,81 +18,84 @@
     <header>
         <div id="navbar-placeholder"></div>
     </header>
-    <div id="notification" class="notification"></div>
     <main>
         <div class="container">
-            <div class="header d-flex container-fluid">
-                <h1>Ventas</h1>
+            <div id="notification" class="notification"></div>
+            <div class="header">
+                <div class="title">
+                    <h1>Ventas</h1>
+                </div>
                 <div class="control">
-                    <form class="d-flex" role="search">
+                    <form role="search" class="d-flex align-items-center">
                         <input class="form-control me-2" id="searchInput" type="search" placeholder="Producto"
                             aria-label="Search">
                         <button type="button" class="btn btn-success" id="searchButton">Buscar</button>
                     </form>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered" id="table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Descuento (%)</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Aquí se agregarán las filas dinámicamente -->
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="4" style="text-align: right;">Total General:</td>
-                                <td id="totalGeneral">$0.00</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th class="th">Nombre</th>
+                            <th class="th">Precio</th>
+                            <th class="th">Cantidad</th>
+                            <th class="th">Descuento (%)</th>
+                            <th class="th">Total</th>
+                            <th class="th">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se agregarán las filas dinámicamente -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="empty" colspan="4" style="text-align: right;"></td>
+                            <td >Total General:</td>
+                            <td id="totalGeneral">$0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
 
-                <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="productModalLabel">Seleccionar Producto</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body" id="modalBody">
-                                <!-- Aquí se cargarán los productos dinámicamente -->
-                            </div>
+            <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="productModalLabel">Seleccionar Producto</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="modalBody">
+                            <!-- Aquí se cargarán los productos dinámicamente -->
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Botón Pagar -->
-                <button type="button" class="btn btn-success" id="payButton">Pagar</button>
+            <!-- Botón Pagar -->
+            <button type="button" class="btn btn-success" id="payButton">Pagar</button>
 
-                <!-- Modal para seleccionar el método de pago -->
-                <div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="payModalLabel">Selecciona el Método de Pago</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+            <!-- Modal para seleccionar el método de pago -->
+            <div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="payModalLabel">Selecciona el Método de Pago</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="totalToPay"></p>
+                            <div>
+                                <p id="payCash"></p>
+                                <p id="payCard"></p>
                             </div>
-                            <div class="modal-body">
-                                <p id="totalToPay"></p>
-                                <div>
-                                    <p id="payCash"></p>
-                                    <p id="payCard"></p>
-                                </div>
-                                <button type="button" class="btn btn-primary" id="finalizarPagoButton">Pagar</button>
-                            </div>
+                            <button type="button" class="btn btn-primary" id="finalizarPagoButton">Pagar</button>
                         </div>
                     </div>
                 </div>
-
+            </div>
+        </div>
     </main>
 </body>
 <script type="module" src="../navbar.js"></script>
