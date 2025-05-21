@@ -10,71 +10,60 @@ const clientesTable = document.getElementById("table");
 
 function updateTable(querySnapshot) {
   let html = "<thead><tr>";
-  const columnNames = [
-    "Producto",
-    "Cantidad",
-    "Acciones"
-  ];
+  const columnNames = ["Producto", "Cantidad", "Acciones"];
 
   columnNames.forEach((columnName) => {
-    const columnClass = columnName === 'Acciones' ? 'hidden' : '';
-    html += `<th class="${columnClass}">${columnName}</th>`;
-
+    html += `<th>${columnName}</th>`;
   });
   html += "</tr></thead><tbody>";
+
+  // Objeto para acumular cantidades por producto
+  const productosAcumulados = {};
 
   querySnapshot.forEach((doc) => {
     const pedidoData = doc.data();
 
-    let producto = "Desconocido"; // Valor por defecto
-    let cantidad = "0"; // Valor por defecto
-
-    // Verificar si existe el array de productos y si tiene elementos
-    if (pedidoData.productos && Array.isArray(pedidoData.productos) && pedidoData.productos.length > 0) {
-      // Caso con array de productos
-      producto = pedidoData.productos.map(p => p.producto).join(", "); // Concatenar todos los productos
-      cantidad = pedidoData.productos.map(p => p.cantidad).join(", "); // Concatenar todas las cantidades
-    } else if (pedidoData.producto && pedidoData.cantidad) {
-      // Caso con campos directos
-      producto = pedidoData.producto;
-      cantidad = pedidoData.cantidad;
+    if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
+      pedidoData.productos.forEach(item => {
+        if (!productosAcumulados[item.producto]) {
+          productosAcumulados[item.producto] = 0;
+        }
+        productosAcumulados[item.producto] += item.cantidad;
+      });
     }
+  });
 
+  // Mostrar los productos acumulados
+  Object.keys(productosAcumulados).forEach(producto => {
     html += `
       <tr>
         <td>${producto}</td>
-        <td>${cantidad}</td>                
+        <td>${productosAcumulados[producto]}</td>
         <td>
-          <button type="button" class="btn btn-success button-view" data-bs-toggle="modal" data-bs-target="#viewProducto" data-id="${doc.id}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">
-            <i class="fas fa-sharp fa-solid fa-eye"></i>
-          </button>          
-          <button type="button" class="btn btn-warning button-edit" data-bs-toggle="modal" data-bs-target="#editProducto" data-id="${doc.id}">
-            <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button type="button" class="btn btn-danger button-delete" data-id=${doc.id}>
+          <button type="button" class="btn btn-danger button-delete" data-producto="${producto}">
             <i class="fas fa-trash"></i>
           </button>
         </td>
       </tr>`;
   });
 
-
   html += '</tbody>';
   clientesTable.innerHTML = html;
 
-  // Listeners para los botones de ver y editar
-  const buttonView = clientesTable.querySelectorAll(".button-view");
-  buttonView.forEach((btn) => {
+  // Listeners para los botones de eliminar
+  const buttonDelete = clientesTable.querySelectorAll(".button-delete");
+  buttonDelete.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
-      const pedidoId = e.currentTarget.getAttribute("data-id");
-      const pedidoData = await getProducto(pedidoId);
-      if (pedidoData !== null) {
-        showProductoModal(pedidoData);
-      } else {
-        console.log("Producto no encontrado");
+      const productoNombre = e.currentTarget.getAttribute("data-producto");
+      if (confirm(`¿Estás seguro de eliminar todas las existencias de ${productoNombre}?`)) {
+        // Aquí necesitarías una función para eliminar o resetear las cantidades
+        await resetProductoPedidos(productoNombre);
+        const updatedQuerySnapshot = await getPedidos();
+        updateTable(updatedQuerySnapshot);
       }
     });
   });
+}
 
   function showProductoModal(pedidoData) {
     const nameElement = document.getElementById("name");
@@ -227,7 +216,7 @@ editForm.addEventListener("submit", handleEditSubmit);
     }, 3000);
   }
 
-}
+
 
 window.addEventListener("DOMContentLoaded", async (e) => {
   const querySnapshot = await getPedidos();

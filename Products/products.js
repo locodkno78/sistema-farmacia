@@ -6,7 +6,7 @@ import {
     updateProduct,
     auth,
 } from "../firebase.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+//import { signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 const clientesTable = document.getElementById("table");
 const openModal = document.getElementById("openRegisterModal");
@@ -300,13 +300,13 @@ function resetTable() {
 }
 const logout = document.querySelector("#logout");
 
-logout.addEventListener("click", async (e) => {
-    e.preventDefault();
-    try {
-        await signOut(auth)
-        window.location.href = "../Logueo/login.html";
-    } catch (error) {
-        console.log(error)
-    }
-});
+//logout.addEventListener("click", async (e) => {
+//    e.preventDefault();
+//    try {
+//        await signOut(auth)
+//        window.location.href = "../Logueo/login.html";
+//    } catch (error) {
+//        console.log(error)
+//    }
+//});
 

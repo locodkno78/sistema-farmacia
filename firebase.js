@@ -212,7 +212,127 @@ export const getProducts = async () => {
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+// Agregar esta función en firebase.js
+export const updateProductStock = async (productName, quantitySold) => {
+  try {
+    // 1. Buscar el producto por nombre
+    const productosRef = collection(db, "productos");
+    const q = query(productosRef, where("name", "==", productName));
+    const querySnapshot = await getDocs(q);
 
+    if (querySnapshot.empty) {
+      throw new Error(`Producto "${productName}" no encontrado`);
+    }
+
+    // 2. Actualizar el stock para cada documento encontrado
+    const updates = [];
+    querySnapshot.forEach((doc) => {
+      const currentStock = doc.data().stock;
+      const newStock = currentStock - quantitySold;
+      
+      if (newStock < 0) {
+        throw new Error(`No hay suficiente stock para ${productName}. Stock actual: ${currentStock}`);
+      }
+
+      updates.push(updateDoc(doc.ref, { stock: newStock }));
+    });
+
+    await Promise.all(updates);
+    return true;
+  } catch (error) {
+    console.error("Error al actualizar stock:", error);
+    throw error; // Re-lanzamos el error para manejarlo en sales.js
+  }
+};
+
+export const getProductByName = async (productName) => {
+  const productosRef = collection(db, "productos");
+  const q = query(productosRef, where("name", "==", productName));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const saveOrUpdatePedido = async (productosVendidos) => {
+  try {
+    // 1. Buscar si ya existe un pedido para estos productos
+    const pedidosRef = collection(db, "pedidos");
+    const q = query(pedidosRef);
+    const querySnapshot = await getDocs(q);
+
+    // 2. Crear un objeto para acumular las cantidades
+    const acumuladorPedidos = {};
+
+    // Primero procesamos los productos nuevos
+    productosVendidos.forEach(producto => {
+      if (!acumuladorPedidos[producto.producto]) {
+        acumuladorPedidos[producto.producto] = 0;
+      }
+      acumuladorPedidos[producto.producto] += producto.cantidad;
+    });
+
+    // Luego sumamos los pedidos existentes
+    querySnapshot.forEach(doc => {
+      const pedidoExistente = doc.data();
+      if (pedidoExistente.productos && Array.isArray(pedidoExistente.productos)) {
+        pedidoExistente.productos.forEach(item => {
+          if (!acumuladorPedidos[item.producto]) {
+            acumuladorPedidos[item.producto] = 0;
+          }
+          acumuladorPedidos[item.producto] += item.cantidad;
+        });
+      }
+    });
+
+    // 3. Convertir el acumulador a formato de array
+    const productosAcumulados = Object.keys(acumuladorPedidos).map(producto => ({
+      producto,
+      cantidad: acumuladorPedidos[producto]
+    }));
+
+    // 4. Si hay pedidos existentes, actualizarlos, sino crear uno nuevo
+    if (!querySnapshot.empty) {
+      // Actualizar el primer documento encontrado (podrías mejorar esto para múltiples documentos)
+      const primerPedido = querySnapshot.docs[0];
+      await updateDoc(primerPedido.ref, {
+        productos: productosAcumulados,
+        fecha: new Date()
+      });
+    } else {
+      // Crear un nuevo pedido
+      await addDoc(pedidosRef, {
+        productos: productosAcumulados,
+        fecha: new Date(),
+        estado: "activo"
+      });
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error al guardar/actualizar pedido:", error);
+    throw error;
+  }
+};
+export const resetProductoPedidos = async (productoNombre) => {
+  try {
+    const pedidosRef = collection(db, "pedidos");
+    const querySnapshot = await getDocs(pedidosRef);
+
+    const updates = [];
+    querySnapshot.forEach(doc => {
+      const pedidoData = doc.data();
+      if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
+        const nuevosProductos = pedidoData.productos.filter(item => item.producto !== productoNombre);
+        updates.push(updateDoc(doc.ref, { productos: nuevosProductos }));
+      }
+    });
+
+    await Promise.all(updates);
+    return true;
+  } catch (error) {
+    console.error("Error al resetear producto en pedidos:", error);
+    throw error;
+  }
+};
 export {
   app, db, doc, auth, setDoc, collection, getDocs,
   addDoc,

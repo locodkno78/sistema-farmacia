@@ -1,4 +1,17 @@
-import { db, collection, addDoc, getDocs } from "../firebase.js";
+import { db, collection, getDocs, updateProductStock, saveOrUpdatePedido, getFormProd } from "../firebase.js";
+
+// ✅ Función para actualizar completamente la vista
+async function actualizarVistaCompleta() {
+    try {
+        console.log("✅ actualizando vista...");
+        const productosSnapshot = await getFormProd();
+
+        document.getElementById("searchInput").value = "";
+        console.log("Vista completamente actualizada");
+    } catch (error) {
+        console.error("Error al actualizar la vista:", error);
+    }
+}
 
 // Función de búsqueda de productos
 document.getElementById("searchButton").addEventListener("click", async () => {
@@ -41,7 +54,7 @@ function mostrarProductosEnModal(productos) {
         div.classList.add("producto-item", "p-2", "border", "mb-2", "d-flex", "justify-content-between");
         div.innerHTML = `
             <span>${producto.name} - $${producto.price}</span>
-            <button class="btn btn-primary btn-sm seleccionar-producto" data-nombre="${producto.name}" data-precio="${producto.price}">Seleccionar</button>
+            <button class="btn btn-success btn-sm seleccionar-producto" data-nombre="${producto.name}" data-precio="${producto.price}">Seleccionar</button>
         `;
         modalBody.appendChild(div);
     });
@@ -50,7 +63,7 @@ function mostrarProductosEnModal(productos) {
     modal.show();
 
     document.querySelectorAll(".seleccionar-producto").forEach(button => {
-        button.addEventListener("click", function() {
+        button.addEventListener("click", function () {
             let nombre = this.getAttribute("data-nombre");
             let precio = parseFloat(this.getAttribute("data-precio"));
             agregarATabla(nombre, precio);
@@ -64,19 +77,15 @@ function mostrarProductosEnModal(productos) {
 let productosEnTabla = [];
 
 // Función para agregar un producto a la tabla
-window.agregarATabla = function(nombre, precio) {
+window.agregarATabla = function (nombre, precio) {
     let table = document.getElementById("table");
     let tbody = table.querySelector("tbody");
 
     let row = tbody.insertRow();
-    
-    // Nombre
-    row.insertCell(0).textContent = nombre;
 
-    // Precio
+    row.insertCell(0).textContent = nombre;
     row.insertCell(1).textContent = `$${precio.toFixed(2)}`;
 
-    // Cantidad (editable)
     let cantidadCell = row.insertCell(2);
     let cantidadInput = document.createElement("input");
     cantidadInput.type = "number";
@@ -86,7 +95,6 @@ window.agregarATabla = function(nombre, precio) {
     cantidadInput.addEventListener("input", actualizarTotal);
     cantidadCell.appendChild(cantidadInput);
 
-    // Descuento (editable, %)
     let descuentoCell = row.insertCell(3);
     let descuentoInput = document.createElement("input");
     descuentoInput.type = "number";
@@ -97,32 +105,24 @@ window.agregarATabla = function(nombre, precio) {
     descuentoInput.addEventListener("input", actualizarTotal);
     descuentoCell.appendChild(descuentoInput);
 
-    // Total (calculado automáticamente)
     let totalCell = row.insertCell(4);
     totalCell.textContent = `$${precio.toFixed(2)}`;
     totalCell.classList.add("total");
 
-    // Celda para boton de acción Eliminar
     let actionCell = row.insertCell(5);
-    actionCell.classList.add("text-center");    
-
-    // Botón Eliminar
+    actionCell.classList.add("text-center");
     let deleteButton = document.createElement("button");
     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
     deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-    deleteButton.addEventListener("click", function() {
+    deleteButton.addEventListener("click", function () {
         row.remove();
         productosEnTabla = productosEnTabla.filter(p => p.row !== row);
         actualizarTotalGeneral();
     });
-
-    // Agregar boton a la celda    
     actionCell.appendChild(deleteButton);
 
-    // Guardar el producto y cantidad para luego enviarlo al pedido
     productosEnTabla.push({ nombre, cantidad: 1, row });
 
-    // Actualizar el total general
     actualizarTotalGeneral();
 };
 
@@ -136,17 +136,15 @@ function actualizarTotal() {
     let total = (precio * cantidad) * (1 - descuento / 100);
     row.querySelector(".total").textContent = `$${total.toFixed(2)}`;
 
-    // Buscar el producto en el array y actualizar la cantidad
     let producto = productosEnTabla.find(p => p.row === row);
     if (producto) {
         producto.cantidad = cantidad;
     }
 
-    // Actualizar el total general
     actualizarTotalGeneral();
 }
 
-// Función para calcular el total de toda la tabla
+// Función para calcular el total general
 function actualizarTotalGeneral() {
     let totalGeneral = 0;
     document.querySelectorAll(".total").forEach(cell => {
@@ -163,54 +161,53 @@ document.getElementById("payButton").addEventListener("click", () => {
     let payCash = document.getElementById("payCash");
     let payCard = document.getElementById("payCard");
 
-    // Mostrar el monto total en el modal
     totalToPay.textContent = `Monto Total a Pagar: $${totalGeneral.toFixed(2)}`;
-
-    // Calcular monto con tarjeta de crédito (3 cuotas)
     let totalConInteres = totalGeneral * 1.25;
 
-    // Mostrar las opciones de pago
     payCash.textContent = `Efectivo, Débito, Crédito (1 pago): $${totalGeneral.toFixed(2)}`;
     payCard.textContent = `Tarjeta de Crédito (3 cuotas): $${totalConInteres.toFixed(2)}`;
 
-    // Mostrar el modal
     let modal = new bootstrap.Modal(document.getElementById("payModal"));
     modal.show();
 });
 
-// Función para realizar el pago y guardar los productos en la colección 'pedidos'
+// Función para realizar el pago y actualizar la vista
 document.getElementById("finalizarPagoButton").addEventListener("click", async () => {
     try {
-        // Creamos el array de productos para la colección 'pedidos'
+        for (const producto of productosEnTabla) {
+            await updateProductStock(producto.nombre, producto.cantidad);
+        }
+
         const pedidoData = productosEnTabla.map(producto => ({
-            producto: producto.nombre, // nombre del producto
-            cantidad: producto.cantidad // cantidad del producto
+            producto: producto.nombre,
+            cantidad: producto.cantidad
         }));
 
-        // Enviar los productos a Firebase (colección "pedidos")
-        const pedidosRef = collection(db, "pedidos");
-        await addDoc(pedidosRef, {
-            productos: pedidoData,  // Guardamos los productos y cantidades
-            total: parseFloat(document.getElementById("totalGeneral").textContent.replace("$", ""))  // Total a pagar
+        await saveOrUpdatePedido(pedidoData);
+
+        Swal.fire({
+            title: '¡Éxito!',
+            text: 'Venta realizada correctamente',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000
         });
 
-        // Mostrar notificación o mensaje de éxito
-        alert("Pago realizado.");
 
-        // Limpiar la tabla
-        document.getElementById("table").querySelector("tbody").innerHTML = ''
+        const payModalElement = document.getElementById("payModal");
+        const payModalInstance = bootstrap.Modal.getInstance(payModalElement);
+        if (payModalInstance) {
+            payModalInstance.hide();
+        }
 
-        // Limpiar los productos en la tabla y en el array
+        document.getElementById("table").querySelector("tbody").innerHTML = '';
         productosEnTabla = [];
-        
-        // Reiniciar total general
         document.getElementById("totalGeneral").textContent = "$0.00";
 
-        // Opcional: Recargar la página para asegurar que todo se reinicie bien
-        location.reload();
+        await actualizarVistaCompleta();
 
     } catch (error) {
-        console.error("Error al realizar el pago:", error);
-        alert("Hubo un error al procesar el pago.");
+        console.error("Error en el proceso completo:", error);
+        alert(`Error al procesar la venta: ${error.message}`);
     }
 });
