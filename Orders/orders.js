@@ -1,13 +1,15 @@
 import {
+  getPedidos,
+  resetProductoPedidos,
   deletePedido,
-  updatePedidos,
   getProducto,
+  updatePedidos,
   auth,
-  getPedidos
 } from "../firebase.js";
 
 const clientesTable = document.getElementById("table");
 
+// Función para actualizar la tabla de pedidos acumulados
 function updateTable(querySnapshot) {
   let html = "<thead><tr>";
   const columnNames = ["Producto", "Cantidad", "Acciones"];
@@ -17,24 +19,35 @@ function updateTable(querySnapshot) {
   });
   html += "</tr></thead><tbody>";
 
-  // Objeto para acumular cantidades por producto
   const productosAcumulados = {};
 
   querySnapshot.forEach((doc) => {
     const pedidoData = doc.data();
 
     if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
-      pedidoData.productos.forEach(item => {
-        if (!productosAcumulados[item.producto]) {
-          productosAcumulados[item.producto] = 0;
+      // Si es el nuevo formato con productos[]
+      pedidoData.productos.forEach((item) => {
+        const cantidad = parseInt(item.cantidad, 10);
+        if (!isNaN(cantidad)) {
+          if (!productosAcumulados[item.producto]) {
+            productosAcumulados[item.producto] = 0;
+          }
+          productosAcumulados[item.producto] += cantidad;
         }
-        productosAcumulados[item.producto] += item.cantidad;
       });
+    } else if (pedidoData.producto && pedidoData.cantidad) {
+      // Si es el formato anterior directo
+      const cantidad = parseInt(pedidoData.cantidad, 10);
+      if (!isNaN(cantidad)) {
+        if (!productosAcumulados[pedidoData.producto]) {
+          productosAcumulados[pedidoData.producto] = 0;
+        }
+        productosAcumulados[pedidoData.producto] += cantidad;
+      }
     }
   });
 
-  // Mostrar los productos acumulados
-  Object.keys(productosAcumulados).forEach(producto => {
+  Object.keys(productosAcumulados).forEach((producto) => {
     html += `
       <tr>
         <td>${producto}</td>
@@ -47,16 +60,15 @@ function updateTable(querySnapshot) {
       </tr>`;
   });
 
-  html += '</tbody>';
+  html += "</tbody>";
   clientesTable.innerHTML = html;
 
-  // Listeners para los botones de eliminar
+  // Listeners para eliminar
   const buttonDelete = clientesTable.querySelectorAll(".button-delete");
   buttonDelete.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const productoNombre = e.currentTarget.getAttribute("data-producto");
       if (confirm(`¿Estás seguro de eliminar todas las existencias de ${productoNombre}?`)) {
-        // Aquí necesitarías una función para eliminar o resetear las cantidades
         await resetProductoPedidos(productoNombre);
         const updatedQuerySnapshot = await getPedidos();
         updateTable(updatedQuerySnapshot);
@@ -65,169 +77,39 @@ function updateTable(querySnapshot) {
   });
 }
 
-  function showProductoModal(pedidoData) {
-    const nameElement = document.getElementById("name");
-    const cantidadElement = document.getElementById("cantidad");
 
-    if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
-      // Si el pedido tiene múltiples productos
-      nameElement.textContent = pedidoData.productos.map(p => p.producto).join(", ");
-      cantidadElement.textContent = pedidoData.productos.map(p => p.cantidad).join(", ");
-    } else {
-      // Si es un solo producto
-      nameElement.textContent = pedidoData.producto || "Desconocido";
-      cantidadElement.textContent = pedidoData.cantidad || "0";
-    }
+// Notificación simple
+function showNotification(message) {
+  const notificationElement = document.getElementById("notification");
+  if (!notificationElement) return;
+  notificationElement.textContent = message;
+  notificationElement.style.backgroundColor = "#08C706";
+  notificationElement.style.color = "white";
+  notificationElement.style.fontSize = "20px";
 
-    const productoModal = document.getElementById("viewProducto");
-    productoModal.classList.add("is-active");
-  }
+  setTimeout(() => {
+    notificationElement.textContent = "";
+  }, 3000);
+}
 
-
-  const closeProductoModalButton = document.getElementById("closeViewModal");
-  closeProductoModalButton.addEventListener("click", () => {
-    const productoModal = document.getElementById("viewProducto");
-    productoModal.classList.remove("is-active");
-  })
-  const buttonDelete = clientesTable.querySelectorAll(".button-delete");
-  buttonDelete.forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
-      const pedidosId = e.currentTarget.getAttribute("data-id");
-      await deletePedido(pedidosId);
-      const newQuerySnapshot = await getPedidos();
-      updateTable(newQuerySnapshot);
-      showNotification("Producto Eliminado");
-    });
-  });
-
-  let currentPedidoId = null; // Variable global para almacenar el ID del pedido en edición
-
-const buttonUpDate = clientesTable.querySelectorAll(".button-edit");
-const editForm = document.getElementById("edit-form");
-
-buttonUpDate.forEach((btn) => {
-  btn.addEventListener("click", async (e) => {
-    currentPedidoId = e.currentTarget.getAttribute("data-id"); // Guardar el ID del pedido actual
-    const pedidoData = await getProducto(currentPedidoId);
-
-    if (pedidoData.productos && Array.isArray(pedidoData.productos) && pedidoData.productos.length > 0) {
-      // Si hay múltiples productos, usa el primero como referencia
-      editForm.elements["name"].value = pedidoData.productos[0].producto || "";
-      editForm.elements["cantidad"].value = pedidoData.productos[0].cantidad || "0";
-    } else {
-      editForm.elements["name"].value = pedidoData.producto || "";
-      editForm.elements["cantidad"].value = pedidoData.cantidad || "0";
-    }
-  });
-});
-
-// Función para manejar el envío del formulario de edición
-const handleEditSubmit = async (event) => {
-  event.preventDefault(); // Evita la recarga de la página
-
-  if (!currentPedidoId) {
-    alert("Error: No se ha seleccionado ningún pedido para editar.");
-    return;
-  }
-
-  // Obtener los nuevos datos del formulario
-  const newProducto = {
-    producto: editForm.elements["name"].value,
-    cantidad: parseInt(editForm.elements["cantidad"].value, 10),
-  };
-
+// Carga inicial
+window.addEventListener("DOMContentLoaded", async () => {
   try {
-    const pedidoData = await getProducto(currentPedidoId); // Obtener datos actuales del pedido
+    const querySnapshot = await getPedidos();
+    console.log("Cantidad de pedidos:", querySnapshot.docs.length); // ✅ esto te dice si llegan datos
 
-    // Si el pedido tiene productos (array de productos), actualizamos el primero
-    if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
-      pedidoData.productos[0] = newProducto; // Actualizamos el primer producto en el array
-    } else {
-      pedidoData.producto = newProducto.producto;
-      pedidoData.cantidad = newProducto.cantidad;
-    }
+    // Mostrar el contenido por consola
+    querySnapshot.forEach(doc => {
+      console.log("Pedido:", doc.data());
+    });
 
-    // Actualizar el pedido con los nuevos datos
-    await updatePedidos(currentPedidoId, pedidoData);
-
-    // Cerrar el modal después de la edición 
-    const editModal = document.getElementById("editProducto");
-    editModal.classList.remove("is-active");
-
-    // Actualizar la tabla después de la edición 
-    const updatedQuerySnapshot = await getPedidos();
-    updateTable(updatedQuerySnapshot);
-    showNotification("Edición Correcta");
+    updateTable(querySnapshot);
   } catch (error) {
-    console.error("Error al actualizar el pedido:", error);
-    alert("Error al actualizar el pedido");
-  }
-};
-
-// Agregar el evento submit al formulario de edición
-editForm.addEventListener("submit", handleEditSubmit);
-
-
-  const deleteAll = document.getElementById("delete");
-
-  deleteAll.addEventListener("click", async () => {
-    const confirmacion = confirm("¿Estás seguro que deseas eliminar todo el pedido?");
-
-    if (confirmacion) {
-      try {
-        // Obtén todas las consultas del cliente
-        const querySnapshot = await getPedidos();
-
-
-        // Elimina cada consulta
-        await Promise.all(querySnapshot.docs.map(async (doc) => {
-          await deletePedido(doc.id);;
-        }));
-
-        // Actualiza la tabla después de eliminar todas las consultas
-        const updatedQuerySnapshot = await getPedidos();
-        const pedidoDataList = updatedQuerySnapshot.docs.map((doc) => {
-          const pedidoData = doc.data();
-          return { ...pedidoData, id: doc.id };
-        });
-
-
-        updateTable(pedidoDataList);
-        showNotification("El pedido se eliminó correctamente");
-      } catch (error) {
-        console.error("Error al eliminar el pedido:", error);
-      }
-    }
-  });
-
-  // Función para mostrar la notificación
-  function showNotification(message) {
-    const notificationElement = document.getElementById("notification");
-    notificationElement.textContent = message;
-
-    // Agrega estilos de diseño o clases 
-    notificationElement.style.backgroundColor = "#08C706"; // Fondo verde
-    notificationElement.style.color = "white"; // Texto blanco
-    notificationElement.style.fontSize = "30px";
-
-    // Muestra la notificación por 3 segundos
-    setTimeout(() => {
-      notificationElement.textContent = "";
-    }, 3000);
-  }
-
-
-
-window.addEventListener("DOMContentLoaded", async (e) => {
-  const querySnapshot = await getPedidos();
-  updateTable(querySnapshot);
-  const user = auth.currentUser;
-  if (user) {
-    const userName = user.displayName;
-    const nameElement = document.getElementById("user-name");
-    nameElement.textContent = userName;
+    console.error("Error al cargar pedidos:", error);
   }
 });
+
+
 
 const searchButton = document.getElementById("searchButton");
 searchButton.addEventListener("click", () => {
@@ -241,18 +123,13 @@ function performSearch(searchTerm) {
 
   rows.forEach((row) => {
     const rowData = row.textContent.toLowerCase();
-    if (rowData.includes(searchTerm)) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
+    row.style.display = rowData.includes(searchTerm) ? "" : "none";
   });
 }
 
 const searchInput = document.getElementById("searchInput");
 searchInput.addEventListener("input", () => {
-  const searchTerm = searchInput.value;
-  if (searchTerm === "") {
+  if (searchInput.value === "") {
     resetTable();
   }
 });
@@ -264,9 +141,7 @@ function resetTable() {
   });
 }
 
-const buttonImprimir = document.getElementById("print");;
-
+const buttonImprimir = document.getElementById("print");
 buttonImprimir.addEventListener("click", () => {
-  // Abre la ventana de impresión
   window.print();
 });

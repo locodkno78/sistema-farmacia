@@ -4,30 +4,30 @@ import { db, collection, addDoc, getDocs, getConsulta, pedidosForm, consultaForm
 document.getElementById("searchButton").addEventListener("click", async () => {
   const searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
   if (searchInput === "") {
-      alert("Ingrese un nombre de producto para buscar.");
-      return;
+    alert("Ingrese un nombre de producto para buscar.");
+    return;
   }
 
   try {
-      const productosRef = collection(db, "productos");
-      const querySnapshot = await getDocs(productosRef);
+    const productosRef = collection(db, "productos");
+    const querySnapshot = await getDocs(productosRef);
 
-      let productosEncontrados = [];
+    let productosEncontrados = [];
 
-      querySnapshot.forEach(doc => {
-          let producto = doc.data();
-          if (producto.name.toLowerCase().includes(searchInput)) {
-              productosEncontrados.push({ id: doc.id, ...producto });
-          }
-      });
-
-      if (productosEncontrados.length > 0) {
-          mostrarProductosEnModal(productosEncontrados);
-      } else {
-          alert("No se encontraron productos.");
+    querySnapshot.forEach(doc => {
+      let producto = doc.data();
+      if (producto.name.toLowerCase().includes(searchInput)) {
+        productosEncontrados.push({ id: doc.id, ...producto });
       }
+    });
+
+    if (productosEncontrados.length > 0) {
+      mostrarProductosEnModal(productosEncontrados);
+    } else {
+      alert("No se encontraron productos.");
+    }
   } catch (error) {
-      console.error("Error al buscar productos:", error);
+    console.error("Error al buscar productos:", error);
   }
 });
 
@@ -36,29 +36,29 @@ function mostrarProductosEnModal(productos) {
   modalBody.innerHTML = "";
 
   productos.forEach(producto => {
-      let div = document.createElement("div");
-      div.classList.add("producto-item", "p-2", "border", "mb-2", "d-flex", "justify-content-between");
-      div.innerHTML = `
+    let div = document.createElement("div");
+    div.classList.add("producto-item", "p-2", "border", "mb-2", "d-flex", "justify-content-between");
+    div.innerHTML = `
           <span>${producto.name} - $${producto.price}</span>
           <button class="btn btn-primary btn-sm seleccionar-producto" data-nombre="${producto.name}" data-precio="${producto.price}">Seleccionar</button>
       `;
-      modalBody.appendChild(div);
+    modalBody.appendChild(div);
   });
 
   let modal = new bootstrap.Modal(document.getElementById("productModal"));
   modal.show();
 
   document.querySelectorAll(".seleccionar-producto").forEach(button => {
-      button.addEventListener("click", function() {
-          let nombre = this.getAttribute("data-nombre");
-          let precio = this.getAttribute("data-precio");
+    button.addEventListener("click", function () {
+      let nombre = this.getAttribute("data-nombre");
+      let precio = this.getAttribute("data-precio");
 
-          // Asignar valores a los campos del formulario
-          document.querySelector("input[name='producto']").value = nombre;
-          document.querySelector("input[name='precio']").value = precio;
+      // Asignar valores a los campos del formulario
+      document.querySelector("input[name='producto']").value = nombre;
+      document.querySelector("input[name='precio']").value = precio;
 
-          modal.hide();
-      });
+      modal.hide();
+    });
   });
 }
 
@@ -129,10 +129,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (clienteId) {
       // Utiliza la función consultaForm para agregar una consulta
       await consultaForm(clienteId, fechaCompra, producto, precio, cantidad, precioT, detalles);
-      
+
       // Utiliza la función pedidosForm para agregar un pedido
+      console.log("Enviando a pedidosForm:", producto, cantidad);
       await pedidosForm(producto, cantidad);
-      
+      console.log("Pedido agregado");
+
+
       showNotification("Compra agregada correctamente");
       form.reset();
       window.location.reload();
@@ -142,12 +145,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function showNotification(message) {
       const notificationElement = document.getElementById("notification");
       notificationElement.textContent = message;
-  
+
       // Agrega estilos de diseño o clases 
       notificationElement.style.backgroundColor = "#08C706"; // Fondo verde
       notificationElement.style.color = "white"; // Texto blanco
       notificationElement.style.fontSize = "30px";
-  
+
       // Muestra la notificación por 3 segundos
       setTimeout(() => {
         notificationElement.textContent = "";
@@ -273,7 +276,7 @@ function updateTable(consultaDataList) {
         // También puedes añadir el clienteId al formulario si lo necesitas después
         editForm.setAttribute("data-cliente-id", clienteId);
         editForm.setAttribute("data-consultas-id", consultasId);
-        
+
         editForm.removeEventListener("submit", handleEditSubmit);
 
         // Agregar el evento submit al formulario
