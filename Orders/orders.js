@@ -1,6 +1,6 @@
 import {
   getPedidos,
-  resetProductoPedidos
+  resetProductoPedidos, deleteAllPedidos
 } from "../firebase.js";
 
 const clientesTable = document.getElementById("table");
@@ -143,6 +143,16 @@ function resetTable() {
     row.style.display = "";
   });
 }
+
+document.getElementById("deleteAllPedidos").addEventListener("click", async () => {
+  if (confirm("¿Estás seguro de que deseas eliminar *todos* los pedidos?")) {
+    await deleteAllPedidos();
+    const snapshot = await getPedidos();
+    updateTable(snapshot);
+    showNotification("Todos los pedidos fueron eliminados.");
+  }
+});
+
 
 const buttonImprimir = document.getElementById("print");
 buttonImprimir.addEventListener("click", () => {

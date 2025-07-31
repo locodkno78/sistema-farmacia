@@ -319,22 +319,48 @@ export const resetProductoPedidos = async (productoNombre) => {
     const pedidosRef = collection(db, "pedidos");
     const querySnapshot = await getDocs(pedidosRef);
 
-    const updates = [];
-    querySnapshot.forEach(doc => {
-      const pedidoData = doc.data();
+    const acciones = [];
+
+    querySnapshot.forEach((docSnap) => {
+      const pedidoData = docSnap.data();
+
       if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
         const nuevosProductos = pedidoData.productos.filter(item => item.producto !== productoNombre);
-        updates.push(updateDoc(doc.ref, { productos: nuevosProductos }));
+
+        if (nuevosProductos.length === 0) {
+          // Si no quedan productos, eliminar el documento
+          acciones.push(deleteDoc(docSnap.ref));
+        } else {
+          // Si quedan otros productos, actualizar el array
+          acciones.push(updateDoc(docSnap.ref, { productos: nuevosProductos }));
+        }
+      } else if (pedidoData.producto === productoNombre) {
+        // Formato viejo: producto suelto
+        acciones.push(deleteDoc(docSnap.ref));
       }
     });
 
-    await Promise.all(updates);
+    await Promise.all(acciones);
     return true;
   } catch (error) {
     console.error("Error al resetear producto en pedidos:", error);
     throw error;
   }
 };
+
+export const deleteAllPedidos = async () => {
+  try {
+    const pedidosRef = collection(db, "pedidos");
+    const snapshot = await getDocs(pedidosRef);
+
+    const deletes = snapshot.docs.map((doc) => deleteDoc(doc.ref));
+    await Promise.all(deletes);
+    console.log("Todos los pedidos fueron eliminados");
+  } catch (error) {
+    console.error("Error al eliminar todos los pedidos:", error);
+  }
+};
+
 export {
   app, db, doc, auth, setDoc, collection, getDocs,
   addDoc,
