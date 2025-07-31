@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, updateDoc, getDoc, setDoc, query,
-  where} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+import {
+  getFirestore, collection, getDocs, addDoc, doc, deleteDoc, updateDoc, getDoc, setDoc, query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -229,7 +231,7 @@ export const updateProductStock = async (productName, quantitySold) => {
     querySnapshot.forEach((doc) => {
       const currentStock = doc.data().stock;
       const newStock = currentStock - quantitySold;
-      
+
       if (newStock < 0) {
         throw new Error(`No hay suficiente stock para ${productName}. Stock actual: ${currentStock}`);
       }
