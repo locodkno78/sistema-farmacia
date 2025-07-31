@@ -1,10 +1,6 @@
 import {
   getPedidos,
-  resetProductoPedidos,
-  deletePedido,
-  getProducto,
-  updatePedidos,
-  auth,
+  resetProductoPedidos
 } from "../firebase.js";
 
 const clientesTable = document.getElementById("table");
@@ -25,7 +21,7 @@ function updateTable(querySnapshot) {
     const pedidoData = doc.data();
 
     if (pedidoData.productos && Array.isArray(pedidoData.productos)) {
-      // Si es el nuevo formato con productos[]
+      // Formato nuevo con array de productos
       pedidoData.productos.forEach((item) => {
         const cantidad = parseInt(item.cantidad, 10);
         if (!isNaN(cantidad)) {
@@ -36,7 +32,7 @@ function updateTable(querySnapshot) {
         }
       });
     } else if (pedidoData.producto && pedidoData.cantidad) {
-      // Si es el formato anterior directo
+      // Formato antiguo con producto y cantidad directos
       const cantidad = parseInt(pedidoData.cantidad, 10);
       if (!isNaN(cantidad)) {
         if (!productosAcumulados[pedidoData.producto]) {
@@ -63,7 +59,7 @@ function updateTable(querySnapshot) {
   html += "</tbody>";
   clientesTable.innerHTML = html;
 
-  // Listeners para eliminar
+  // Listeners para eliminar producto
   const buttonDelete = clientesTable.querySelectorAll(".button-delete");
   buttonDelete.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
@@ -76,6 +72,13 @@ function updateTable(querySnapshot) {
     });
   });
 }
+
+// 🔄 Cargar la tabla al iniciar
+window.addEventListener("DOMContentLoaded", async () => {
+  const querySnapshot = await getPedidos();
+  updateTable(querySnapshot);
+});
+
 
 
 // Notificación simple
