@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Carga el navbar y configura los listeners
 async function loadNavbar() {
   try {
-    const response = await fetch('/navbar.html');
+    const navbarUrl = new URL('./navbar.html', import.meta.url).href;
+    const response = await fetch(navbarUrl);
     if (!response.ok) throw new Error('No se pudo cargar el navbar');
     
     const data = await response.text();

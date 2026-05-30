@@ -141,17 +141,25 @@ function updateTable(querySnapshot) {
       description: editForm.elements["description"].value,
     };
 
-    // Actualizar el cliente
-    await updateCliente(clienteId, newData);
+    try {
+      // Actualizar el cliente
+      await updateCliente(clienteId, newData);
 
-    // Cerrar el modal después de la edición 
-    const editModal = document.getElementById("editCustomer");
-    editModal.classList.remove("is-active");
+      // Actualizar la tabla después de la edición 
+      const updatedQuerySnapshot = await getForm();
+      updateTable(updatedQuerySnapshot);
+      showNotification("Edición Correcta");
 
-    // Actualizar la tabla después de la edición 
-    const updatedQuerySnapshot = await getForm();
-    updateTable(updatedQuerySnapshot);
-    showNotification("Edición Correcta");
+      // Cerrar el modal después de actualizar
+      const editModal = document.getElementById("editCustomer");
+      const bootstrapModal = bootstrap.Modal.getInstance(editModal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
+    } catch (error) {
+      console.error("Error al actualizar cliente:", error);
+      showNotification("Error al guardar los cambios", "error");
+    }
   };
   const buttonDelete = clientesTable.querySelectorAll(".button-delete");
   buttonDelete.forEach((btn) => {
