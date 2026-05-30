@@ -62,10 +62,10 @@ function updateUserInfo() {
 function setupNavbarListeners() {
   // Configuración de navegación
   const navButtons = {
-    '.button-sales': '/Sales/sales.html',
-    '.button-customers': '/Customers/tableCustomers.html',
-    '.button-order': '/Orders/orders.html',
-    '.button-products': '/Products/products.html'
+    '.button-sales': '../Sales/sales.html',
+    '.button-customers': '../Customers/tableCustomers.html',
+    '.button-order': '../Orders/orders.html',
+    '.button-products': '../Products/products.html'
   };
 
   Object.entries(navButtons).forEach(([selector, path]) => {
@@ -92,7 +92,7 @@ async function handleLogout(e) {
   e.preventDefault();
   try {
     await signOut(auth);
-    window.location.href = "/Logueo/login.html";
+    window.location.href = "../Logueo/login.html";
   } catch (error) {
     console.error('Error al cerrar sesión:', error);
     showNotification('Error al cerrar sesión', 'error');
