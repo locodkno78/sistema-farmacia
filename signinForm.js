@@ -2,6 +2,16 @@ import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/1
 import { auth } from "./firebase.js";
 import { showMessage } from "./showMessage.js";
 
+// Prevenir volver atrás desde la página de login
+window.addEventListener('load', function() {
+  // Reemplazar el estado actual para que no pueda volver atrás
+  window.history.pushState(null, null, window.location.href);
+});
+
+window.addEventListener('popstate', function() {
+  // Si intenta volver atrás, lo redirige al login
+  window.history.pushState(null, null, window.location.href);
+});
 
 const signInForm = document.querySelector("#login-form");
 

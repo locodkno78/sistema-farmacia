@@ -92,7 +92,12 @@ async function handleLogout(e) {
   e.preventDefault();
   try {
     await signOut(auth);
-    window.location.href = "../Logueo/login.html";
+    // Convertir la ruta relativa a una URL absoluta
+    const loginUrl = new URL('../login.html', window.location.href).href;
+    
+    window.history.pushState(null, null, window.location.href);
+    window.history.replaceState(null, null, loginUrl);
+    window.location.href = loginUrl;
   } catch (error) {
     console.error('Error al cerrar sesión:', error);
     showNotification('Error al cerrar sesión', 'error');
